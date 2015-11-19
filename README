@@ -1,0 +1,51 @@
+DeWall & InCoDe 
+Two fast 3d Delaunay triangulators
+
+This package contains:
+        DeWall and InCode,      two 3d Delaunay triangulators. 
+        Bubbles                 an utility for 2d-3d Dataset generation,
+
+You can find more descriptive information in the two text files dewall.txt and 
+incode.txt and in the PostScript file Delaunay.Triangulators.ps.
+
+
+To install the whole package configure and run the makefile in this directory.
+To build  a single program type 'make' followed by the name of the program,
+i.e. to build DeWall type:
+        make dewall
+after configuring the Makefile.
+
+To configure the makefiles you must edit them and modify some lines.  
+To change the compiler change this line:
+
+CC=gcc
+
+and substitute 'gcc' with the name of your C compiler. Note that you need 
+an ANSI C compiler. Sun user cannot use the native 'cc', but must install an 
+ANSI C compiler as the GNU one (a public domain machine indipendent ANSI c/c++
+compiler).
+
+To change the machine settings uncomment the line relative to your machine 
+removing the starting '#'. 
+
+MYFLAGS = -O -I$(PWD)/../include -DSUN
+
+Available machines:
+
+- SunOs 4.1
+- Hp-UX 8.05
+- Silicon Graphics Irix 4.0
+- Any machine with ANSI C compiler (Warning: inaccurate timings)
+- MsDos 3.30 or later.
+
+After configuring the Makefile type 'make' to build all the programs.
+
+To build  a single program type 'make' followed by the name of the program,
+i.e. to build DeWall type:
+        make dewall
+
+After building all you have four executables (incode, dewall, isosurf and 
+bubbles)  that can be used as described in the documentation (incode.txt,
+dewall.txt, isosurf.txt and bubbles.txt).
+
+

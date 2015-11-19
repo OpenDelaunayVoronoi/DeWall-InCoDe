@@ -1,0 +1,46 @@
+
+				FILES CONTENTS
+
+
+This file contains a brief description of files used for the implementation
+of OList abstract type. For a more complete description see the description
+at beginning of each file.
+
+
+Contents of files
+
+
+    FILE	PURPOSE
+
+
+GENERAL FILES
+
+ contents.txt   This file.
+
+  general.h	Define useful general purpose costants and macros.
+
+ 3dgmprot.h	Prototypes of the function in 3dgeom.c.
+
+    error.h	Protos and defines for error.c
+
+    error.c	Implementing functions for error handling
+
+  chronos.h	Protos and defines for chronos.c
+
+  chronos.c	Implementing machine indipendent timing functions.
+
+OLIST FILES
+
+ 1) listprot.h	Prototypes of LIST functions.
+
+ 2)    olist.h	 Define list and queue types;
+
+ 3)	list.c	 Implement a wide collection of general purpose functions
+ 		for creating and deleting lists.
+
+ 4)  listobj.c	Implements functions for manipulating object contained in
+		Lists.
+
+ 5) listscan.c	Implementing functions for scanning object in lists.
+
+ 6) listhash.c	Implementing functions for hashing object in lists.

@@ -1,0 +1,5 @@
+rm InCoDeResult
+incode ../tst/2000.1.pnt nul |tee InCoDeResult
+incode ../tst/4000.1.pnt nul |tee -a InCoDeResult
+incode ../tst/6000.1.pnt nul |tee -a InCoDeResult
+incode ../tst/8000.1.pnt nul |tee -a InCoDeResult

@@ -1,0 +1,22 @@
+ontents of this directory:
+
+DeWall/         Source code for DeWall, a divide and conquer 3d Delaunay 
+                triangulator.
+
+Incode/         Source code for InCoDe, an incremental construction
+                3d Delaunay triangulator.
+
+OList/          Source code for OList, a set of List management functions;
+
+include/        Include files for OList.
+
+Bubbles/        A tool for generating random, clustered and
+                unclusterd dataset.
+
+tst/            Some test dataset generated with Bubbles.
+
+contents.txt    This file.
+
+README          General information about the two triangulator and how to
+                build them.
+

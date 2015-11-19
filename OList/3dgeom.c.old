@@ -1,0 +1,680 @@
+/***************************************************************************
+******************************* 09/Sep/92 **********************************
+****************************   Version 1.0   *******************************
+************************* Author: Paolo Cignoni ****************************
+*									   *
+*    FILE:	3dgeom.c						   *
+*									   *
+* PURPOSE:	implement a wide collection of general purpose functions   *
+*		on 3d vectors, line and planes. 			   *
+*									   *
+* EXPORTS:	all the functions					   *
+*									   *
+* IMPORTS:								   *
+*									   *
+* GLOBALS:								   *
+*									   *
+*   NOTES:	Use the constants and macros defined in general.h	   *
+*		The first part of this file is stolen from the public	   *
+*		domain code published in:				   *
+*									   *
+*				Graphics Gems				   *
+*			  edited by A. S. Glassner			   *
+*		      Academic Press Inc. London 1990			   *
+*									   *
+*									   *
+****************************************************************************
+***************************************************************************/
+
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <OList/general.h>
+#include "3dgeom.h"
+
+/*
+ * V3SquaredLength
+ *
+ * returns squared length of input vector a.
+ */
+
+double V3SquaredLength(Vector3 *a)
+{
+ return((a->x * a->x)+(a->y * a->y)+(a->z * a->z));
+}
+
+
+/*
+ * V3Length
+ *
+ * returns length of input vector a.
+ */
+
+double V3Length(Vector3 *a)
+{
+ return(sqrt(V3SquaredLength(a)));
+}
+
+
+/*
+ * V3Negate
+ *
+ * Negates the input vector v and returns it.
+ */
+
+Vector3 *V3Negate(Vector3 *v)
+{
+ v->x = -v->x;  v->y = -v->y;  v->z = -v->z;
+ return(v);
+}
+
+/*
+ * V3Normalize
+ *
+ * Normalizes the input vector and returns it.
+ * If the vector has null lenght the function returns it unchanged.
+ */
+Vector3 *V3Normalize(Vector3 *v)
+{
+ double len = V3Length(v);
+
+ if (len != 0.0)
+ 	{
+ 	 v->x /= len;
+ 	 v->y /= len;
+ 	 v->z /= len;
+ 	}
+ return(v);
+}
+
+/*
+ * V3Scale
+ *
+ * Scales the input vector to the new length and returns it
+ */
+Vector3 *V3Scale(Vector3 *v, double newlen)
+{
+ double len = V3Length(v);
+
+ if (len != 0.0)
+ 	{
+	 v->x *= newlen/len;
+	 v->y *= newlen/len;
+	 v->z *= newlen/len;
+	};
+ return(v);
+}
+
+
+/*
+ * V3Add V3Sum
+ *
+ * Return vector sum c = a+b
+ * V3Add V3Sum are identical, (the reason because i inserted both of them
+ * is my lack of memory ;)
+ */
+
+Vector3 *V3Add(Vector3 *a, Vector3 *b, Vector3 *c)
+{
+ c->x = a->x+b->x;  c->y = a->y+b->y;  c->z = a->z+b->z;
+ return(c);
+}
+
+Vector3 *V3Sum(Vector3 *a, Vector3 *b, Vector3 *c)
+{
+ c->x = a->x+b->x;  c->y = a->y+b->y;  c->z = a->z+b->z;
+ return(c);
+}
+
+
+/*
+ * V3Sub
+ *
+ * Return vector difference c = a+b
+ */
+
+Vector3 *V3Sub(Vector3 *a, Vector3 *b, Vector3 *c)
+{
+ c->x = a->x-b->x;  c->y = a->y-b->y;  c->z = a->z-b->z;
+ return(c);
+}
+
+
+/*
+ * V3Dot
+ *
+ * Return the dot (italian scalar) product of vectors a and b.
+ */
+
+double V3Dot(Vector3 *a, Vector3 *b)
+{
+ return((a->x*b->x)+(a->y*b->y)+(a->z*b->z));
+}
+
+
+/*
+ * V3Lerp
+ *
+ * This function linearly interpolate two vectors by an amount alpha
+ * and return the resulting vector.
+ * NOTE:
+ * 	  When alpha=0 	result=lo.
+ * 	  When alpha=1 	result=hi.
+ */
+
+Vector3 *V3Lerp(Vector3 *lo, Vector3 *hi,double  alpha, Vector3 *result)
+{
+ result->x = LERP(alpha, lo->x, hi->x);
+ result->y = LERP(alpha, lo->y, hi->y);
+ result->z = LERP(alpha, lo->z, hi->z);
+ return(result);
+}
+
+/* make a linear combination of two vectors and return the result. */
+/* result = (a * ascl) + (b * bscl) */
+Vector3 *V3Combine (Vector3 *a, Vector3 *b, Vector3 *result, double ascl, double bscl)
+{
+ result->x = (ascl * a->x) + (bscl * b->x);
+ result->y = (ascl * a->y) + (bscl * b->y);
+ result->y = (ascl * a->z) + (bscl * b->z);
+ return(result);
+}
+
+
+/* multiply two vectors together component-wise and return the result */
+Vector3 *V3Mul (Vector3 *a, Vector3 *b, Vector3 *result)
+{
+ result->x = a->x * b->x;
+ result->y = a->y * b->y;
+ result->z = a->z * b->z;
+ return(result);
+}
+
+/*
+ * V3Per
+ *
+ * Return the product of vector a by scalar b.
+ */
+
+Vector3 *V3Per(Vector3 *a, double b)
+{
+ a->x*=b;
+ a->y*=b;
+ a->z*=b;
+ return a;
+}
+
+
+/*
+ * V3DistanceBetween2Points
+ *
+ * Return the distance between two points
+ */
+
+double V3DistanceBetween2Points(Point3 *a, Point3 *b)
+{
+ double dx = a->x - b->x;
+ double dy = a->y - b->y;
+ double dz = a->z - b->z;
+ return(sqrt((dx*dx)+(dy*dy)+(dz*dz)));
+}
+
+/*
+ * V3SquaredDistanceBetween2Points
+ *
+ * Return the squared distance between two points
+ */
+
+double V3SquaredDistanceBetween2Points(Point3 *a, Point3 *b)
+{
+ double dx = a->x - b->x;
+ double dy = a->y - b->y;
+ double dz = a->z - b->z;
+ return((dx*dx)+(dy*dy)+(dz*dz));
+}
+
+
+/*
+ * V3Cross
+ *
+ * Return the cross product between two vectors.
+ */
+
+Vector3 *V3Cross(Vector3 *a, Vector3 *b, Vector3 *c)
+{
+ c->x = (a->y*b->z) - (a->z*b->y);
+ c->y = (a->z*b->x) - (a->x*b->z);
+ c->z = (a->x*b->y) - (a->y*b->x);
+ return(c);
+}
+
+/* create, initialize, and return a new vector */
+Vector3 *V3New(double x, double y, double z)
+{
+ Vector3 *v = NEWTYPE(Vector3);
+ v->x = x;  v->y = y;  v->z = z;
+ return(v);
+}
+
+/* create, initialize, and return a duplicate vector */
+Vector3 *V3Duplicate(Vector3 *a)
+{
+ Vector3 *v = NEWTYPE(Vector3);
+ v->x = a->x;  v->y = a->y;  v->z = a->z;
+ return(v);
+}
+
+
+/* multiply a point by a matrix and return the transformed point */
+Point3 *V3MulPointByMatrix(Point3 *p, Matrix4 *m)
+{
+ double w;
+ Point3 ptmp;
+
+ ptmp.x = (p->x * m->element[0][0]) + (p->y * m->element[1][0]) +
+	  (p->z * m->element[2][0]) + m->element[3][0];
+ ptmp.y = (p->x * m->element[0][1]) + (p->y * m->element[1][1]) +
+	  (p->z * m->element[2][1]) + m->element[3][1];
+ ptmp.z = (p->x * m->element[0][2]) + (p->y * m->element[1][2]) +
+	  (p->z * m->element[2][2]) + m->element[3][2];
+
+ w = (p->x * m->element[0][3]) +
+     (p->y * m->element[1][3]) +
+     (p->z * m->element[2][3]) +
+      m->element[3][3];
+
+ if (w != 0.0)
+ 	{
+ 	 ptmp.x /= w;
+ 	 ptmp.y /= w;
+ 	 ptmp.z /= w;
+ 	}
+
+ *p = ptmp;
+ return(p);
+}
+
+/* multiply together matrices c = ab */
+/* note that c must not point to either of the input matrices */
+Matrix4 *V3MatMul(Matrix4 *a, Matrix4 *b, Matrix4 *c)
+{
+ int i, j, k;
+
+ for (i=0; i<4; i++)
+	{
+	 for (j=0; j<4; j++)
+		{
+		 c->element[i][j] = 0;
+		 for (k=0; k<4; k++)
+		 	c->element[i][j] += a->element[i][k] * b->element[k][j];
+		}
+	}
+
+ return(c);
+}
+
+/* binary greatest common divisor by Silver and Terzian.  See Knuth */
+/* both inputs must be >= 0 */
+int gcd(int u, int v)
+{
+ int k, t, f;
+
+ if ((u<0) || (v<0)) return(1); /* error if u<0 or v<0 */
+ k = 0;  f = 1;
+ while ((0 == (u%2)) && (0 == (v%2)))
+ 	{
+	 k++;
+	 u>>=1;
+	 v>>=1;
+	 f*=2;
+	}
+ if (u&01) { t = -v;  goto B4; } else { t = u; }
+ B3: if (t > 0)  t >>= 1;
+            else t = -((-t) >> 1);
+ B4: if (0 == (t%2)) goto B3;
+
+ if (t > 0) u = t; else v = -t;
+ if (0 != (t = u - v)) goto B3;
+ return(u*f);
+}
+
+
+/***************************
+*			   *
+* Here Starts My Functions *
+*			   *
+***************************/
+
+/***************************************************************************
+*									   *
+* FUNCTION:	LineBy2Pnts						   *
+*									   *
+*  PURPOSE:	Find the Line3 passing through 2 points.		   *
+*									   *
+*   PARAMS:	the two points and the line pointer			   *
+*									   *
+*   RETURN:	line pointer if succeded				   *
+*		NULL else.						   *
+*									   *
+*  IMPORTS:	None							   *
+*									   *
+*    NOTES:	You must pass a significative line pointer, the function   *
+*		allocate nothing.					   *
+*		The line is directed from v1 to v2.			   *
+*		To find line you must calculate:			   *
+*									   *
+*		  1) Direction of line					   *
+*		  2) The vector Temp that is the projection		   *
+*		     of v1 on direction 				   *
+*		  3) The distance of line from origin, that is equivalent  *
+*		     to scompose v1 in two perpendicular components. One   *
+*		     of this components is temp and the other:		   *
+*			l->v = v1 - temp				   *
+*			v1 = temp + l->v				   *
+*									   *
+***************************************************************************/
+
+Line3 *LineBy2Pnts(Point3 *v1, Point3 *v2, Line3 *l)
+{
+ double pl;
+ Vector3 Temp;
+
+ V3Sub(v2,v1,&(l->u));
+
+ if(l->u.x==0 && l->u.y==0 && l->u.z==0) return NULL;
+
+ V3Normalize(&(l->u));       	/* 1 */
+
+ pl = V3Dot(&(l->u), v1);
+ V3Per(&Temp, pl);              /* 2 */
+
+ V3Sub(v1,&Temp,&(l->v));	 /* 3 */
+ return l;
+}
+
+
+/***************************************************************************
+
+ FUNCTION:	LineBy2Planes
+
+  PURPOSE:	Find the Line3 intersection of two planes.
+
+   PARAMS:	the two planes and the line pointer
+
+   RETURN:	line pointer if succeded
+   		NULL else.
+
+  IMPORTS:	None
+
+    NOTES:	You must pass a significative line pointer, the function
+    		allocate nothing.
+    		The direction of the line can be calculated as the
+    		cross product of the two plane normals.
+
+    		Given the two equation of planes:
+
+    		 	a1x + b1y + c1z = d1
+    		 	a2x + b2y + c2z = d2
+
+    		 	solving for x in the first equation
+    		 	and substituing:
+
+    		 	    d1 - b1 y - c1 z
+    		 	x = ----------------
+    		 		 a1
+
+    	       		 z(a1c2 - a2c1) - a1d2 + a2d1
+    		  y = - ------------------------------
+    		 		a1b2 - a2b1
+
+		Using these equations we can find a point on the
+		intersection between two planes and using the
+		same technique of LineBy2Pnts we can find the
+		vector l->v of line.
+
+***************************************************************************/
+/*
+Line3 *LineBy2Planes(Plane3 *p1, Plane3 *p2, Line3 *l)
+{
+ return l;
+}
+*/
+/***************************************************************************
+
+ FUNCTION:	PointBelongToLine
+
+  PURPOSE:	Testing the membership of a point to a line.
+
+   PARAMS:	the point and the Line pointers.
+
+   RETURN:	TRUE if point belong to line
+		FALSE if point dont belong to line.
+
+  IMPORTS:	None
+
+    NOTES:	To know if a point belongs to a line you must calculate:
+
+		1) The point TempP as line passes through origin
+		2) the value t for which the x coord is on line equation:
+		    p=v+u@t
+		3) check that t value is right for y and z coords.
+
+***************************************************************************/
+
+boolean PointBelongToLine(Point3 *p, Line3 *l)
+{
+ Point3 Temp;
+ double t;
+
+ V3Sub(p,&(l->v),&Temp);		    /* 1) */
+
+ t=Temp.x / l->u.x;			    /* 2) */
+
+ if(Temp.y*t==l->u.y && Temp.z*t==l->u.z) return TRUE;	/* 3) */
+				 else return FALSE;
+
+}
+
+
+/***************************************************************************
+
+ FUNCTION:	PlaneBy3Pnts
+
+  PURPOSE:	Find the plane passing through 3 points.
+
+   PARAMS:	the three points and the plane pointer
+
+   RETURN:	plane pointer if succeded
+   		NULL else.
+
+  IMPORTS:	None
+
+    NOTES:	You must pass a significative plane pointer, the function
+    		allocate nothing.
+    		The normal to the plane is directed so that standing up along
+    		normal you can see p0 p1 p2 counter clockwise (right hand
+    		rule applied to the three points).
+
+***************************************************************************/
+Plane3 *PlaneBy3Pnts(Vector3 *p0, Vector3 *p1, Vector3 *p2, Plane3 *p )
+{
+ Vector3 v1, v2;
+ Vector3 *u;
+
+ u=&(p->u);
+
+ V3Sub(p1,p0,&v1);
+ V3Sub(p2,p0,&v2);
+ V3Cross(&v1,&v2,u);
+
+ if(u->x==0.0 && u->y==0.0 && u->z==0.0) return NULL;
+
+ V3Normalize(u);         	/* the plane normal must be unitary */
+
+ p->d=V3Dot(u,p0);		/* the distance between plane and origin is */
+ 				/* proiection of a point on the unitary     */
+ 				/* normal vector to the plane.              */
+ return p;
+}
+
+/***************************************************************************
+
+ FUNCTION:	PointBelongToPlane
+
+  PURPOSE:	Testing the membership of a point to a plane.
+
+   PARAMS:	the point and the Plane pointers.
+
+   RETURN:	TRUE if point belong to plane
+   		FALSE if point dont belong to plane.
+
+  IMPORTS:	None
+
+    NOTES:	A point belongs to a plane if its projection on the
+    		unitary normal at the plane is equal to distance d;
+
+***************************************************************************/
+
+boolean PointBelongtoPlane(Point3 *p, Plane3 *pl)
+{
+ if(pl->d==V3Dot(p,&(pl->u))) return TRUE;
+			 else return FALSE;
+}
+
+
+
+/***************************************************************************
+
+ FUNCTION:	CalcPlaneInter
+
+  PURPOSE:	To calculate the intersection between three planes.
+
+   PARAMS:	the point and the planes pointers.
+
+   RETURN:	The point pointer if successful;
+   		NULL else.
+
+  IMPORTS:	None
+
+    NOTES:	To calculate the intersection between three planes
+    		we solve a linear 3x3 system.
+    		The inverse matrix of the system is found in the
+    		following way:
+
+	    + a11 a22 - a12 a21	 a02 a21 - a01 a22    a01 a12 - a02 a11 +
+   -1  1    |								|
+  A = ---   | a12 a20 - a10 a22	 a00 a22 - a02 a20    a02 a10 - a00 a12 |
+      det   |								|
+	    + a10 a21 - a11 a20	 a01 a20 - a00 a21    a00 a11 - a01 a10 +
+
+	    	This expansion was found with the help of
+	    	DERIVE (Soft Warehouse inc. Honolulu).
+
+***************************************************************************/
+Point3 *CalcPlaneInter(Plane3 *p0, Plane3 *p1, Plane3 *p2, Point3 *c)
+{
+ double det;
+ double  a[3][3],inv[3][3];
+ Vector3 V;
+
+
+ V.x=p0->d;
+ V.y=p1->d;
+ V.z=p2->d;
+
+ a[0][0]=p0->u.x;
+ a[0][1]=p0->u.y;
+ a[0][2]=p0->u.z;
+
+ a[1][0]=p1->u.x;
+ a[1][1]=p1->u.y;
+ a[1][2]=p1->u.z;
+
+ a[2][0]=p2->u.x;
+ a[2][1]=p2->u.y;
+ a[2][2]=p2->u.z;
+
+ det=a[0][0]*(a[1][1]*a[2][2]-a[1][2]*a[2][1])+
+     a[0][1]*(a[1][2]*a[2][0]-a[1][0]*a[2][2])+
+     a[0][2]*(a[1][0]*a[2][1]-a[1][1]*a[2][0]);
+
+ if(det == 0) return NULL;
+
+
+ inv[0][0]= a[1][1]*a[2][2]-a[1][2]*a[2][1];
+ inv[0][1]= a[0][2]*a[2][1]-a[0][1]*a[2][2];
+ inv[0][2]= a[0][1]*a[1][2]-a[0][2]*a[1][1];
+
+ inv[1][0]= a[1][2]*a[2][0]-a[1][0]*a[2][2];
+ inv[1][1]= a[0][0]*a[2][2]-a[0][2]*a[2][0];
+ inv[1][2]= a[0][2]*a[1][0]-a[0][0]*a[1][2];
+
+ inv[2][0]= a[1][0]*a[2][1]-a[1][1]*a[2][0];
+ inv[2][1]= a[0][1]*a[2][0]-a[0][0]*a[2][1];
+ inv[2][2]= a[0][0]*a[1][1]-a[0][1]*a[1][0];
+
+
+ c->x=(inv[0][0]*V.x +inv[0][1]*V.y +inv[0][2]*V.z)/det;
+ c->y=(inv[1][0]*V.x +inv[1][1]*V.y +inv[1][2]*V.z)/det;
+ c->z=(inv[2][0]*V.x +inv[2][1]*V.y +inv[2][2]*V.z)/det;
+
+ return c;
+}
+
+
+/***************************************************************************
+
+ FUNCTION:	CalcLinePlaneInter
+
+  PURPOSE:	Calculating the intersection between a line and a plane.
+
+   PARAMS:	the Line3 and the Plane3 pointers.
+
+   RETURN:	The intersection point if successful
+   		NULL else
+
+  IMPORTS:	None
+
+    NOTES:	To find the intersection between line and plane
+    		you must calculate:
+
+    		1) a new offset newd as the line pass through origin
+    		        newd = p->d - (l->v*p->u)
+
+    		2) the projection lenght pl of line direction l->u
+    		   on plane normal p->u:
+    		   	pl = l->u*p->u)
+
+    		3) the distance of plane dp from origin along
+    		   direction l->u
+    		        dp = newd/pl
+
+    		4) the point c where line intersecate plane
+    			c = l->v + dp@l->u
+
+    		--------------
+    		'*' dot product (vector, vector) -> scalar
+		'@' product	(scalar, vector) -> vector
+
+***************************************************************************/
+
+Point3 *CalcLinePlaneInter(Line3 *l, Plane3 *p, Point3 *c)
+{
+ double newd,   	/* new offset */
+ 	pl,             /* projection lenght of l->u on p->u */
+ 	dp;             /* plane distance plane from origin along l->u */
+
+ newd = p->d - V3Dot(&(l->v), &(p->u));                	/* 1) */
+
+ pl = V3Dot(&(l->u), &(p->u));                          /* 2) */
+ if(pl==0) return NULL;
+ dp = newd/pl;                                          /* 3) */
+
+ c->x = l->u.x * pl;                                    /* 4) */
+ c->y = l->u.y * pl;
+ c->z = l->u.z * pl;
+
+ V3Add(c, &(l->v), c);
+
+ return c;
+}

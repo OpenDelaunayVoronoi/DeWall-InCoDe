@@ -1,0 +1,60 @@
+
+    BUBBLES 1.1
+
+
+    SYNOPSIS
+
+       bubbles: a program for generating random clustered 2d/3d point datasets
+
+    SYNTAX
+
+       bubbles [-u|-n] [-c|-r|-v] [-2d|-3d] npoints nbubbles boxsize
+
+    where:
+
+       -u   (default)  use uniform distribution
+       -n	       use an approximation of normal distribution
+
+       -c   (default)  Constant number of sites for bubble.
+       -r	       Random number of sites for bubble.
+       -v	       Number of sites proprortional to bubble volume.
+
+       -2d	       Sites in two dimensions.
+       -3d  (default)  Sites in three dimensions.
+
+       npoints	       total number of sites produced
+       nbubbles        number of bubbles (clusters) of sites
+       boxsize	       size of box containing all sites
+
+    AUTHOR
+
+       Paolo Cignoni
+
+    NOTES
+
+       This program generate on stdout a wide variety of 3d point (sites)
+       random datasets.
+       Its main role is building datasets for testing algoritms. For this
+       reason user can choose the distribution function between a uniform
+       and an approximated normal (the well known gaussian bell). Sites in
+       dataset can be clustered in bubbles to simulate strange distribution
+       of real data; user can choose the number of bubbles and how many sites
+       are contained in each ball. Using Normal distribution each bubble has
+       its normal distribution centered in bubble center.
+
+       Switches on site number for bubble:
+
+       -c	       Each bubble contain the same number of sites, more
+		       precisely Each bubble contain npoints/nbubbles sites.
+
+       -r	       Each bubble contain a random number of sites, but the
+		       sum of all bubbles contains always npoints sites.
+		       The random function is the uniform one
+
+       -v	       Each bubble contain a number of sites proportional
+		       to its volume. In this way all the bubbles has the
+		       same sites density, and the datasets is similar to
+		       a unique bubble with some holes (Swiss cheese dataset)
+
+       If there is only one bubble it is origin centered and has the radius
+       of the box (it hasn't sense to move and squeeze it).

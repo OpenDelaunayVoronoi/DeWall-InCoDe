@@ -1,0 +1,129 @@
+
+    InCoDe 1.0
+
+
+    NAME
+
+	InCoDe: a program for generating 3d Delaunay triangulations
+
+    SYNOPSYS
+
+	incode [-s[1|2]] [-u nnn] [-p] [-c] [-f|-t] Filein [Fileout]
+
+    where:
+
+        -s      Turn on statistic informations (descriptive format)
+        -s1     Turn on statistic informations (numerical only format)
+        -s2     Turn on statistic informations
+                (numerical+descriptive line format)
+        -u nnn  Set Uniform Grid size (nnn = no. of cells)
+        -p      print the number of tetrahedra built while processing
+        -c      Check every tetrahedron is a Delaunay one
+        -t      Check for double creating Tetrahedra (caused by num. errors)
+	-f	Check for double creating Face (caused by numerical errors)
+
+        filein  file of points to be triangulated
+        fileout triangulation output file
+
+
+    NOTES
+
+       This program builds the 3d Delaunay triangulation 
+       adopting the InCoDe algorithm described in:
+
+       P. Cignoni, C. Montani, R. Scopigno		d
+       "A Merge-First Divide and Conquer Algorithm for E
+       Delaunay Triangulation"
+       CNUCE Internal Report C92/16 Oct 1992
+
+    INPUT FILE FORMAT
+
+       The point set to be triangulate has the following format:
+
+       n
+       x1 y1 z1
+       x2 y2 z2
+       ...
+       xi yi zi
+       ...
+       xn yn zn
+
+       where n is the number of points in the set, and xi yi zi are their
+       cartesian coordinates.
+
+   OUTPUT FILE FORMAT
+ 
+       The triangulated set is returned with the following format:
+
+       m
+       a1 b1 c1 d1
+       a2 b2 c2 d2
+       ...
+       ai bi ci di
+       ...
+       am bm cm dm
+
+       where m is the number of tetrahedra built, and ai bi ci di are the
+       vertex indices of the i-th tetrahedron; such indices are relative
+       to the point file.
+
+   OPTIONS
+
+   A more detailed description of options follows. 
+
+  -s[1|2] Turn on statistic informations; at the end of the work the
+	program show the following report:
+
+  +----- Statistical Informations ----------------------------------------+
+  |Points     |Time (sec.)|Tetras     |Faces      |CH Faces   |TetraRadius|
+  |  10000    |244.750    |  66445    | 133021    |    262    |  7.849    |
+  |UGMakeTetra|Empty Box  | 2nd Box   |Useful 2nd |PntPerFace |CellPerFace|
+  |  66706    |    295    |  46206    |   7347    |  19.90    |  39.78    
+  |Cell       |Empty Cell |MaxPntCell |Cell Side  |
+  |  10648    |   4221    |      8    |  0.928    |
+
+        Most of these Statistical informations have been deviced in order to
+        debug and evaluate the program, but some of them can be explained more
+        accurately in order to show  the good behaviour of Uniform Grid (UG) 
+        techniques in Computational Geometry.
+        The algorithm use the UG to speed up an incremental construction
+        technique that whould have needed an O(n) point scanning for each
+        face of the triangulation. Using the UG we reduce the ideal bound
+        to the average value indicated in PntPerFace field.
+        Similarly the CellPerFace field says the average number of cells of
+        the UG we analyze for each face.
+
+	The -s1 and -s2 options print the same Statistical information
+	in a format more easily readable from spreadsheet and statistical
+	packages.
+
+  -u nnn    Normally the UG size, i.e. number of its cells, is proportional
+	to dataset size; this option override that and set UG size to a be nnn
+
+  -p    Print the current number of tetrahedra built while processing.
+        It does not slow down the algorithm appreciabily (in UNIX output
+        is buffered).
+ 
+  -f    These options force the program to do additional internal testing
+  -t    for avoiding that numerical errors cause endless loop of the program.
+        They slow down incode of a 10-20%.
+ 
+  -c    Tests that each built tetrahedra is a Delaunay one checking that each
+        point of the dataset is out of the circumsphere of that tetrahedron.
+        It makes incode a quadratic algoritm. This option is nearly useless,
+        except for developer for testing the correctnes of the program when
+        experimenting code modifications.
+
+   KNOWN BUGS AND LIMITATIONS
+
+   On some large dataset (over twenty thousands points) the algorithm loops
+   or fails, may be due to numerical errors (insufficient numeric precision).
+   InCoDe does not manage dataset which contain 4 or more cospherical points;
+   Dewall cannot therefore be applied to regular grid datasets.
+ 
+   AUTHORS
+ 
+   This first version of InCoDe was written by P. Cignoni, C. Montani and
+   R. Scopigno in 1992. This work was supported in part by "Progetto finalizzato   Sistemi Informatici e Calcolo Parallelo" of the Consiglio Nazionale delle
+   Ricerche.
+

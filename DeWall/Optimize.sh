@@ -1,0 +1,1 @@
+cc -O3 -non_shared -mips2 -DSGI -I../include -I../OList -sopt *.c ../OList/*.c -o dewalloptstd -lm

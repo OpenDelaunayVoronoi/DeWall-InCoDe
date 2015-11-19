@@ -1,0 +1,5 @@
+rm DeWallResult
+dewall ../tst/2000.1.pnt nul |tee DeWallResult
+dewall ../tst/4000.1.pnt nul |tee -a DeWallResult
+dewall ../tst/6000.1.pnt nul |tee -a DeWallResult
+dewall ../tst/8000.1.pnt nul |tee -a DeWallResult
